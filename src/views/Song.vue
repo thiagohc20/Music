@@ -29,7 +29,7 @@
         <i class="fa fa-comments float-right text-green-400 text-2xl"></i>
       </div>
       <div class="p-6">
-        <SongsCommentSubmit :getSong="getSong" />
+        <SongsCommentSubmit :getSong="getSong" :getComments="getComments" />
         <!-- Sort Comments -->
         <select
           class="block mt-4 py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
@@ -65,11 +65,6 @@ export default {
     this.getSong()
     this.getComments()
   },
-  // watch: {
-  //   songs() {
-  //     this.getComments()
-  //   }
-  // },
   methods: {
     async getSong() {
       const song = await songsCollection.doc(this.$route.params.id).get()
@@ -83,6 +78,7 @@ export default {
     },
 
     async getComments() {
+      this.comments = []
       const comments = await songsCollection
         .doc(this.$route.params.id)
         .collection('comments')
@@ -92,7 +88,8 @@ export default {
       comments.forEach((comment) => {
         this.comments.push(comment.data())
       })
-      //format date
+
+      // format date
       this.comments.forEach((comment) => {
         const date = new Date(comment.created_at.seconds * 1000)
         comment.created_at = date.toLocaleDateString('en-US', {
@@ -100,7 +97,6 @@ export default {
           month: 'long',
           day: 'numeric'
         })
-        console.log(comment.comment)
       })
     }
   }

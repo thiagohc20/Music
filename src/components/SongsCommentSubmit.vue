@@ -33,6 +33,10 @@ export default {
     getSong: {
       type: Function,
       required: true
+    },
+    getComments: {
+      type: Function,
+      required: true
     }
   },
   data() {
@@ -94,6 +98,7 @@ export default {
         }, 2000)
       }
       this.getSong()
+      this.getComments()
     }
   }
 }
