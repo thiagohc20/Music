@@ -80,9 +80,5 @@ export default {
       next(leave)
     }
   }
-  // beforeRouteLeave (to, from, next) {
-  //   this.$refs.upload.cancelUploads();
-  //   next()
-  // }
 }
 </script>
