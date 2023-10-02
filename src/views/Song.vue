@@ -3,7 +3,7 @@
   <section class="w-full mb-8 py-14 text-center text-white relative">
     <div
       class="absolute inset-0 w-full h-full box-border bg-contain music-bg"
-      style="background-image: url(assets/img/song-header.png)"
+      style="background-image: url(/Music/assets/img/song-header.png)"
     ></div>
     <div class="container mx-auto flex items-center">
       <!-- Play/Pause Button -->
@@ -32,6 +32,7 @@
         <SongsCommentSubmit :getSong="getSong" :getComments="getComments" />
         <!-- Sort Comments -->
         <select
+          v-model="sort"
           class="block mt-4 py-1.5 px-3 text-gray-800 border border-gray-300 transition duration-500 focus:outline-none focus:border-black rounded"
         >
           <option value="1">Latest</option>
@@ -41,11 +42,11 @@
     </div>
   </section>
   <ul class="container mx-auto">
-    <SongsComments v-for="comment in comments" :key="comment" :comment="comment" />
+    <SongsComments v-for="comment in sortedComments" :key="comment" :comment="comment" />
   </ul>
 </template>
 <script>
-import { songsCollection } from '../includes/firebase'
+import { songsCollection, commentsCollection } from '../includes/firebase'
 import SongsComments from '@/components/SongsComments.vue'
 import SongsCommentSubmit from '../components/SongsCommentSubmit.vue'
 
@@ -58,7 +59,8 @@ export default {
   data() {
     return {
       songs: {},
-      comments: []
+      comments: [],
+      sort: '1'
     }
   },
   created() {
@@ -79,24 +81,31 @@ export default {
 
     async getComments() {
       this.comments = []
-      const comments = await songsCollection
-        .doc(this.$route.params.id)
-        .collection('comments')
-        .orderBy('created_at', 'desc')
-        .get()
+      const comments = await commentsCollection.orderBy('created_at', 'desc').get()
 
       comments.forEach((comment) => {
-        this.comments.push(comment.data())
-      })
-
-      // format date
-      this.comments.forEach((comment) => {
-        const date = new Date(comment.created_at.seconds * 1000)
-        comment.created_at = date.toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric'
+        this.comments.push({
+          docID: comment.id,
+          ...comment.data()
         })
+      })
+      console.log(this.comments)
+    }
+  },
+  // watch: {
+  //   sort() {
+  //     if (this.sort === 2) {
+  //       this.getComments()
+  //     }
+  //   }
+  // },
+  computed: {
+    sortedComments() {
+      return this.comments.slice().sort((a, b) => {
+        if (this.sort === '1') {
+          return new Date(b.created_at) - new Date(a.created_at)
+        }
+        return new Date(a.created_at) - new Date(b.created_at)
       })
     }
   }

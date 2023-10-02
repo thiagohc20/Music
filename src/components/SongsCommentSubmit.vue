@@ -24,7 +24,7 @@
   </vee-form>
 </template>
 <script>
-import { songsCollection, auth } from '../includes/firebase'
+import { songsCollection, commentsCollection, auth } from '../includes/firebase'
 import firebase from 'firebase/app'
 
 export default {
@@ -52,7 +52,7 @@ export default {
     }
   },
   methods: {
-    async comment(values) {
+    async comment(values, { resetForm }) {
       this.comment_in_submission = true
       this.comment_show_alert = true
       this.comment_alert_variant = 'bg-blue-500'
@@ -70,14 +70,15 @@ export default {
       }
 
       const comment = {
+        song_id: this.$route.params.id,
         uid: auth.currentUser.uid,
         user: auth.currentUser.displayName,
         comment: values.comment,
-        created_at: new Date()
+        created_at: new Date().toString()
       }
 
       try {
-        await songsCollection.doc(this.$route.params.id).collection('comments').add(comment)
+        await commentsCollection.add(comment)
         await songsCollection.doc(this.$route.params.id).update({
           comment_count: firebase.firestore.FieldValue.increment(1)
         })
@@ -99,6 +100,7 @@ export default {
       }
       this.getSong()
       this.getComments()
+      resetForm()
     }
   }
 }
