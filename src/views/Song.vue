@@ -92,13 +92,6 @@ export default {
       console.log(this.comments)
     }
   },
-  // watch: {
-  //   sort() {
-  //     if (this.sort === 2) {
-  //       this.getComments()
-  //     }
-  //   }
-  // },
   computed: {
     sortedComments() {
       return this.comments.slice().sort((a, b) => {
