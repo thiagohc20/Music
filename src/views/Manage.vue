@@ -60,7 +60,6 @@ export default {
       this.songs.splice(i, 1)
     },
     addSong(document) {
-      console.log(document.data())
       const song = {
         ...document.data(),
         docID: document.id

@@ -8,6 +8,7 @@
     <div class="container mx-auto flex items-center">
       <!-- Play/Pause Button -->
       <button
+        @click.prevent="playSong(songs)"
         type="button"
         class="z-50 h-24 w-24 text-3xl bg-white text-black rounded-full focus:outline-none"
       >
@@ -25,7 +26,7 @@
     <div class="bg-white rounded border border-gray-200 relative flex flex-col">
       <div class="px-6 pt-6 pb-5 font-bold border-b border-gray-200">
         <!-- Comment Count -->
-        <span class="card-title">Comments {{ songs.comment_count }}</span>
+        <span class="card-title">Comments ({{ songs.comment_count }})</span>
         <i class="fa fa-comments float-right text-green-400 text-2xl"></i>
       </div>
       <div class="p-6">
@@ -49,6 +50,8 @@
 import { songsCollection, commentsCollection } from '../includes/firebase'
 import SongsComments from '@/components/SongsComments.vue'
 import SongsCommentSubmit from '../components/SongsCommentSubmit.vue'
+import { mapActions } from 'pinia'
+import usePlayerStore from '@/stores/player'
 
 export default {
   name: 'Song',
@@ -68,6 +71,7 @@ export default {
     this.getComments()
   },
   methods: {
+    ...mapActions(usePlayerStore, ['playSong']),
     async getSong() {
       const song = await songsCollection.doc(this.$route.params.id).get()
 
@@ -77,6 +81,11 @@ export default {
       }
 
       this.songs = song.data()
+
+      const { sort } = this.$route.query
+      if (sort === '1' || sort === '2') {
+        this.sort = sort
+      }
     },
 
     async getComments() {
@@ -89,7 +98,12 @@ export default {
           ...comment.data()
         })
       })
-      console.log(this.comments)
+    }
+  },
+  watch: {
+    sort(newVal) {
+      if (newVal === this.$route.query.sort) return
+      this.$router.push({ query: { sort: newVal } })
     }
   },
   computed: {
