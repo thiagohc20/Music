@@ -68,7 +68,6 @@ export default {
         }, 2000)
         return
       }
-
       const comment = {
         song_id: this.$route.params.id,
         uid: auth.currentUser.uid,
@@ -90,6 +89,7 @@ export default {
           this.comment_show_alert = false
         }, 2000)
       } catch (error) {
+        console.log(error)
         this.comment_in_submission = false
         this.comment_show_alert = true
         this.comment_alert_variant = 'bg-red-500'
