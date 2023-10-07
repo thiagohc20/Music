@@ -73,28 +73,24 @@ export default {
       sort: '1'
     }
   },
-  created() {
-    this.getSong()
-    this.getComments()
-  },
-  methods: {
-    ...mapActions(usePlayerStore, ['playSong']),
-    async getSong() {
-      const song = await songsCollection.doc(this.$route.params.id).get()
-
+  async beforeRouteEnter(to, from, next) {
+    const song = await songsCollection.doc(to.params.id).get()
+    next((vm) => {
       if (!song.exists) {
-        this.$router.push({ name: 'home' })
+        vm.$router.push({ name: 'home' })
         return
       }
 
-      this.songs = song.data()
+      const { sort } = vm.$route.query
 
-      const { sort } = this.$route.query
-      if (sort === '1' || sort === '2') {
-        this.sort = sort
-      }
-    },
+      vm.sort = sort === '1' || sort === '2' ? sort : '1'
 
+      vm.songs = song.data()
+      vm.getComments()
+    })
+  },
+  methods: {
+    ...mapActions(usePlayerStore, ['playSong']),
     async getComments() {
       this.comments = []
       const comments = await commentsCollection
