@@ -2,9 +2,9 @@
   <app-header />
 
   <router-view v-slot="{ Component }">
-    <transition name="fade" mode="out-in">
+    <Transition name="slide-fade">
       <component :is="Component"></component>
-    </transition>
+    </Transition>
   </router-view>
   <!-- Player -->
   <app-player />
@@ -36,17 +36,18 @@ export default {
   }
 }
 </script>
-<style>
-.fade-enter-from {
-  opacity: 0;
+<style scoped>
+.slide-fade-enter-active {
+  transition: all 0.3s ease-out;
 }
 
-.fade-enter-active {
-  transition: all 0.5s linear;
+.slide-fade-leave-active {
+  transition: all 0.3s cubic-bezier(1, 0.3, 0.3, 1);
 }
 
-.fade-leave-to {
-  transition: all 0.5s linear;
+.slide-fade-enter-from,
+.slide-fade-leave-to {
+  transform: translateX(20px);
   opacity: 0;
 }
 </style>
